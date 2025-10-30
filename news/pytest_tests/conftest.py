@@ -1,6 +1,11 @@
+from datetime import datetime, timedelta
+
 import pytest
+from django.conf import settings
 
 from django.test.client import Client
+from django.urls import reverse
+from django.utils import timezone
 
 from news.models import News, Comment
 
@@ -58,3 +63,48 @@ def news_id_for_args(news):
 @pytest.fixture
 def comment_id_for_args(comment):
     return (comment.id,)
+
+
+@pytest.fixture
+def all_news():
+    today = datetime.today()
+    all_news = [
+        News(
+            title=f'Новость {index}',
+            text='Просто текст.',
+            date=today - timedelta(days=index)
+        )
+        for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
+    ]
+    News.objects.bulk_create(all_news)
+
+
+@pytest.fixture
+def home_url():
+    home_url = reverse('news:home')
+    return home_url
+
+
+@pytest.fixture
+def detail_url(news_id_for_args):
+    detail_url = reverse('news:detail', args=news_id_for_args)
+    return detail_url
+
+
+@pytest.fixture
+def now():
+    now = timezone.now()
+    return now
+
+
+@pytest.fixture
+def all_comments(news, comment_author, now):
+    for index in range(10):
+        # Создаём объект и записываем его в переменную.
+        comment = Comment.objects.create(
+            news=news, author=comment_author, text=f'Tекст {index}',
+        )
+        # Сразу после создания меняем время создания комментария.
+        comment.created = now + timedelta(days=index)
+        # И сохраняем эти изменения.
+        comment.save()
