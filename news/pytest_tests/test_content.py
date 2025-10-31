@@ -38,4 +38,3 @@ def test_comments_order(detail_news_url, client, all_comments):
 def test_user_has_comment_form(user_client, detail_news_url, result):
     response = user_client.get(detail_news_url)
     assert ('form' in response.context) is result
-
