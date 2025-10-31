@@ -23,7 +23,13 @@ def comment_text():
 
 
 @pytest.fixture
-def comment(news, comment_author):
+def new_comment_text():
+    new_comment_text = 'Обновлённый комментарий'
+    return new_comment_text
+
+
+@pytest.fixture
+def comment(news, comment_author, comment_text):
     comment = Comment.objects.create(
         news=news,
         author=comment_author,
@@ -117,3 +123,27 @@ def all_comments(news, comment_author, now):
 def form_data(comment_text):
     form_data = {'text': comment_text}
     return form_data
+
+
+@pytest.fixture
+def form_data_with_new_comment_text(new_comment_text):
+    new_form_data = {'text': new_comment_text}
+    return new_form_data
+
+
+@pytest.fixture
+def url_to_comments(detail_news_url):
+    url_to_comments = detail_news_url + '#comments'
+    return url_to_comments
+
+
+@pytest.fixture
+def comment_edit_url(comment_id_for_args):
+    comment_edit_url = reverse('news:edit', args=comment_id_for_args)
+    return comment_edit_url
+
+
+@pytest.fixture
+def comment_delete_url(comment_id_for_args):
+    comment_delete_url = reverse('news:delete', args=comment_id_for_args)
+    return comment_delete_url
