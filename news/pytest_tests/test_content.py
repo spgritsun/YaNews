@@ -21,8 +21,8 @@ def test_news_order(all_news, client, home_url):
     assert all_dates == sorted_dates
 
 
-def test_comments_order(detail_url, client, all_comments):
-    response = client.get(detail_url)
+def test_comments_order(detail_news_url, client, all_comments):
+    response = client.get(detail_news_url)
     assert 'news' in response.context
     news = response.context['news']
     all_comments = news.comment_set.all()
@@ -35,6 +35,6 @@ def test_comments_order(detail_url, client, all_comments):
         (lf('reader_client'), True),
         (lf('client'), False),
 ))
-def test_user_has_comment_form(user_client, detail_url, result):
-    response = user_client.get(detail_url)
+def test_user_has_comment_form(user_client, detail_news_url, result):
+    response = user_client.get(detail_news_url)
     assert ('form' in response.context) is result

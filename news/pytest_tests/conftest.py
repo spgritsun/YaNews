@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 
 import pytest
-from django.conf import settings
 
+from django.conf import settings
 from django.test.client import Client
 from django.urls import reverse
 from django.utils import timezone
@@ -17,11 +17,17 @@ def news():
 
 
 @pytest.fixture
+def comment_text():
+    comment_text = 'Текст комментария'
+    return comment_text
+
+
+@pytest.fixture
 def comment(news, comment_author):
     comment = Comment.objects.create(
         news=news,
         author=comment_author,
-        text='Текст комментария')
+        text=comment_text)
     return comment
 
 
@@ -86,9 +92,9 @@ def home_url():
 
 
 @pytest.fixture
-def detail_url(news_id_for_args):
-    detail_url = reverse('news:detail', args=news_id_for_args)
-    return detail_url
+def detail_news_url(news_id_for_args):
+    detail_news_url = reverse('news:detail', args=news_id_for_args)
+    return detail_news_url
 
 
 @pytest.fixture
@@ -100,11 +106,14 @@ def now():
 @pytest.fixture
 def all_comments(news, comment_author, now):
     for index in range(10):
-        # Создаём объект и записываем его в переменную.
         comment = Comment.objects.create(
             news=news, author=comment_author, text=f'Tекст {index}',
         )
-        # Сразу после создания меняем время создания комментария.
         comment.created = now + timedelta(days=index)
-        # И сохраняем эти изменения.
         comment.save()
+
+
+@pytest.fixture
+def form_data(comment_text):
+    form_data = {'text': comment_text}
+    return form_data
