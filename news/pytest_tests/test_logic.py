@@ -44,7 +44,6 @@ def test_author_can_delete_comment(comment_author_client,
                                    comment_delete_url, url_to_comments):
     response = comment_author_client.delete(comment_delete_url)
     assertRedirects(response, url_to_comments)
-    assert response.status_code == HTTPStatus.FOUND
     comments_count = Comment.objects.count()
     assert comments_count == 0
 
@@ -70,7 +69,8 @@ def test_author_can_edit_comment(
 def test_user_cant_edit_comment_of_another_user(
         reader_client, comment_edit_url, form_data_with_new_comment_text,
         comment, comment_text):
-    response = reader_client.post(comment_edit_url, data=form_data_with_new_comment_text)
+    response = reader_client.post(comment_edit_url,
+                                  data=form_data_with_new_comment_text)
     assert response.status_code == HTTPStatus.NOT_FOUND
     comment.refresh_from_db()
     assert comment.text == comment_text
