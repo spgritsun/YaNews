@@ -3,8 +3,7 @@ import pytest
 from django.conf import settings
 from pytest_lazy_fixtures import lf
 
-pytestmark = pytest.mark.django_db
-
+from news.forms import CommentForm
 
 def test_news_count(all_news, client, home_url):
     response = client.get(home_url)
@@ -31,10 +30,12 @@ def test_comments_order(detail_news_url, client, all_comments):
     assert all_timestamps == sorted_timestamps
 
 
-@pytest.mark.parametrize('user_client, result', (
+@pytest.mark.parametrize('client_type, result', (
         (lf('reader_client'), True),
         (lf('client'), False),
 ))
-def test_user_has_comment_form(user_client, detail_news_url, result):
-    response = user_client.get(detail_news_url)
+def test_user_has_comment_form(client_type, detail_news_url, result):
+    response = client_type.get(detail_news_url)
     assert ('form' in response.context) is result
+    if result:
+        assert isinstance(response.context['form'], CommentForm)
